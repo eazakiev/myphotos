@@ -13,8 +13,8 @@
     {% endif %}
 
     <h2>{{ p.title }}</h2>
-    {% autoescape on %} {{p.content|linebreaks|truncatewords:50}} {%
-    endautoescape %}
+    {% autoescape on %} {{p.content|linebreaks|truncatewords:50}}
+    {% endautoescape %}
 
     <div class="clear"></div>
     <p class="link-read-post">
