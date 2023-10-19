@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "myphotos"
+version = "0.1.0"
+description = ""
+authors = ["Evgeny <zakiev_e@mail.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+django = "^4.2.5"
+django-debug-toolbar = "^4.2.0"
+django-simple-captcha = "^0.5.18"
+mysqlclient = "^2.2.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

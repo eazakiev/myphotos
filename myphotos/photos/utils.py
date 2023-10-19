@@ -1,5 +1,7 @@
 from django.db.models import Count
 from .models import Category
+from django.core.cache import cache
+
 
 
 menu = [{'title': "О сайте", 'url_name': 'about'},
@@ -22,7 +24,7 @@ class DataMixin:
     #     # берем из кэша данные коллекции БД, если есть
     #     cats = cache.get('cats')
     #     if not cats:  # если нет, то читаем из БД
-    #         cats = Category.objects.annotate(Count('women'))
+    #         cats = Category.objects.annotate(Count('photos'))
     #         cache.set('cats', cats, 60)  # добавляем в кэш данные коллекции
 
         user_menu = menu.copy()

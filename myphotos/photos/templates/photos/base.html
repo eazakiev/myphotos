@@ -1,5 +1,5 @@
 {% load static %}
-{% comment %} {% load photos_tags %} {% endcomment %}
+{% load photos_tags %}
 
 <!DOCTYPE html>
 <html>
@@ -35,6 +35,7 @@
 {% endblock mainmenu %}
 
 
+
 <table class="table-content" border=0 cellpadding="0" cellspacing="0">
 <tr>
 <!-- Sidebar слева -->
@@ -49,7 +50,7 @@
 
 
 {% for c in cats %}
-{% if c.women__count > 0 %}
+{% if c.photos__count > 0 %}
 	{% if c.pk == cat_selected %}
 		<li class='selected'>{{c.name}}</li>
 	{% else %}
@@ -60,7 +61,7 @@
 
 
 		<li class="share">
-		<p>Наш канал</p>
+		<p>Мой канал</p>
 		<a class="share-yt" href="https://www.youtube.com/channel/UChuUF3vVD_1kyIN5po31eXw" target="_blank" rel="nofollow"></a>
 		</li>
 	</ul>
