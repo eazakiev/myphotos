@@ -143,7 +143,7 @@ INTERNAL_IPS = [
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': os.path.join(BASE_DIR, 'celeb_cache'),
+        'LOCATION': os.path.join(BASE_DIR, 'myphoto_cache'),
     }
 }
 
