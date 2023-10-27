@@ -153,6 +153,6 @@ CACHES = {
 #         "LOCATION": "/var/tmp/celeb_cache",
 #     }
 # }
-CAPTCHA_FONT_SIZE = 30
+CAPTCHA_FONT_SIZE = 50
 CAPTCHA_FOREGROUND_COLOR = '#343695'
 CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'

@@ -16,7 +16,8 @@ class PhotosHome(DataMixin, ListView):
     """Класс для получения главной страницы сайта
     Args:
         DataMixin (class): _description_
-        ListView (class): _description_"""
+        ListView (class): _description_
+    """
 
     model = MyPhotos
     template_name = "photos/index.html"
