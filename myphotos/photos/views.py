@@ -1,15 +1,13 @@
 from django.http import HttpResponseNotFound
 from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, CreateView, FormView
+from django.views.generic import ListView, DetailView, CreateView, FormView, UpdateView
 from .forms import AddPostForm, LoginUserForm, RegisterUserForm, ContactForm
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import logout, login
 from django.contrib.auth.views import LoginView
-from .models import Category, MyPhotos
-from .utils import DataMixin
-
-from .utils import menu
+from .models import Category, MyPhotos, TagPost
+from .utils import DataMixin, menu
 
 
 class PhotosHome(DataMixin, ListView):
@@ -27,7 +25,6 @@ class PhotosHome(DataMixin, ListView):
         """Получение контекста для главной страницы сайта"""
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title="Главная страница")
-        # dict(list(context.items()) + list(c_def.items()))
         return context | c_def
 
     def get_queryset(self):
@@ -38,10 +35,7 @@ class PhotosHome(DataMixin, ListView):
 def about(request):
     """О сайте"""
     contact_list = MyPhotos.objects.all()
-    # paginator = Paginator(contact_list, 3)  # Show 3 contacts per page.
-
     page_number = request.GET.get("page")
-    # page_obj = paginator.get_page(page_number) 'page_obj': page_obj,
     return render(request, "photos/about.html", {"title": "О сайте", "menu": menu})
 
 
@@ -69,6 +63,17 @@ class AddPage(LoginRequiredMixin, DataMixin, CreateView):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title="Добавление статьи")
         return context | c_def
+
+
+class UpdatePage(UpdateView):
+    model = MyPhotos
+    fields = ["title", "content", "photo", "is_published", "cat"]
+    template_name = "photos/addpage.html"
+    success_url = reverse_lazy("home")
+    extra_context = {
+        "menu": menu,
+        "title": "Редактирование статьи",
+    }
 
 
 class ContactFormView(DataMixin, FormView):
@@ -108,7 +113,6 @@ class ShowPost(DataMixin, DetailView):
     model = MyPhotos
     template_name = "photos/post.html"
     slug_url_kwarg = "post_slug"
-    # pk_url_kwarg = 'post_pk'
     context_object_name = "post"
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -116,6 +120,11 @@ class ShowPost(DataMixin, DetailView):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title=context["post"])
         return context | c_def
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(
+            MyPhotos.published, slug=self.kwargs[self.slug_url_kwarg]
+        )
 
 
 class PhotosCategory(DataMixin, ListView):
@@ -198,3 +207,28 @@ def logout_user(request):
     """Получение перенаправления после авторизации пользователя"""
     logout(request)
     return redirect("login")
+
+
+class TagPostList(ListView):
+    """Класс получение списка постов по тегу
+    Args:
+        DataMixin (class): _description_
+        LoginView (class): _description_
+    """
+
+    template_name = "photos/index.html"
+    context_object_name = "posts"
+    allow_empty = False
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tag = TagPost.objects.get(slug=self.kwargs["tag_slug"])
+        context["title"] = "Тег: " + tag.tag
+        context["menu"] = menu
+        context["cat_selected"] = None
+        return context
+
+    def get_queryset(self):
+        return MyPhotos.published.filter(
+            tags__slug=self.kwargs["tag_slug"]
+        ).select_related("cat")

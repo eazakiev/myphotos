@@ -33,14 +33,29 @@ class MyPhotos(models.Model):
         max_length=255, unique=True, db_index=True, verbose_name="URL"
     )
     content = models.TextField(blank=True, verbose_name="Контент")
-    photo = models.ImageField(upload_to="photos/%Y/%m/%d/", verbose_name="Фото")
+    photo = models.ImageField(
+        upload_to="photos/%Y/%m/%d/",
+        default=None,
+        blank=True,
+        null=True,
+        verbose_name="Фото",
+    )
     time_create = models.DateTimeField(auto_now_add=True, verbose_name="Время создания")
     time_update = models.DateTimeField(auto_now=True, verbose_name="Время изменения")
-    is_published = models.BooleanField(default=True, verbose_name="Публикация")
-    cat = models.ForeignKey(
-        "Category", on_delete=models.PROTECT, verbose_name="Категории"
+    is_published = models.BooleanField(
+        choices=tuple(map(lambda x: (bool(x[0]), x[1]), Status.choices)),
+        default=Status.DRAFT,
+        verbose_name="Публикация",
     )
-    tags = models.ManyToManyField("TagPost", blank=True, related_name="tags")
+    cat = models.ForeignKey(
+        "Category",
+        on_delete=models.PROTECT,
+        related_name="posts",
+        verbose_name="Категории",
+    )
+    tags = models.ManyToManyField(
+        "TagPost", blank=True, related_name="tags", verbose_name="Теги"
+    )
 
     objects = models.Manager()
     published = PublishedManager()
@@ -106,3 +121,7 @@ class TagPost(models.Model):
     def get_absolute_url(self):
         """Формирует адрес для каждой конкретной записи тега"""
         return reverse("tag", kwargs={"tag_slug": self.slug})
+
+
+class UploadFile(models.Model):
+    file = models.FileField(upload_to="uploads_model")

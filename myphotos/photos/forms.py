@@ -17,15 +17,16 @@ class AddPostForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         """Конструктор формы для добавления поста"""
         super().__init__(*args, **kwargs)
-        self.fields['cat'].empty_label = 'Категория не выбрана'
+        self.fields["cat"].empty_label = "Категория не выбрана"
 
     class Meta:
         """Метаданные для формы добавления поста"""
+
         model = MyPhotos
-        fields = ['title', 'slug', 'content', 'photo', 'is_published', 'cat']
+        fields = ["title", "slug", "content", "photo", "is_published", "cat", "tags"]
         widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-input'}),
-            'content': forms.Textarea(attrs={'cols': 50, 'rows': 5}),
+            "title": forms.TextInput(attrs={"class": "form-input"}),
+            "content": forms.Textarea(attrs={"cols": 50, "rows": 5}),
         }
 
     def clean_title(self):
@@ -33,8 +34,8 @@ class AddPostForm(forms.ModelForm):
         загруженного поста, не позволял вводить строку более 200 символов
         """
         title = self.cleaned_data["title"]
-        if len(title) > 200:
-            raise ValidationError('Длина превышает 200 символов')
+        if len(title) > 50:
+            raise ValidationError("Длина превышает 50 символов")
         return title
 
 
@@ -43,25 +44,39 @@ class RegisterUserForm(UserCreationForm):
     Args:
         UserCreationForm (class): _description_
     """
+
     username = forms.CharField(
-        label='Логин', widget=forms.TextInput(attrs={'class': 'form-input'}))
+        label="Логин", widget=forms.TextInput(attrs={"class": "form-input"})
+    )
     first_name = forms.CharField(
-        label='Имя', widget=forms.TextInput(attrs={'class': 'form-input'}))
+        label="Имя", widget=forms.TextInput(attrs={"class": "form-input"})
+    )
     last_name = forms.CharField(
-        label='Фамилия', widget=forms.TextInput(attrs={'class': 'form-input'}))
+        label="Фамилия", widget=forms.TextInput(attrs={"class": "form-input"})
+    )
     email = forms.EmailField(
-        label='Email', widget=forms.EmailInput(attrs={'class': 'form-input'}))
+        label="Email", widget=forms.EmailInput(attrs={"class": "form-input"})
+    )
     password1 = forms.CharField(
-        label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-input'}))
-    password2 = forms.CharField(label='Повтор пароля', widget=forms.PasswordInput(
-        attrs={'class': 'form-input'}))
-    captcha = CaptchaField(label='Введите ответ')
+        label="Пароль", widget=forms.PasswordInput(attrs={"class": "form-input"})
+    )
+    password2 = forms.CharField(
+        label="Повтор пароля", widget=forms.PasswordInput(attrs={"class": "form-input"})
+    )
+    captcha = CaptchaField(label="Введите ответ")
 
     class Meta:
         """Метаданные для формы регистрации пользователя"""
+
         model = User
-        fields = ('username', 'first_name', 'last_name',
-                  'email', 'password1', 'password2')
+        fields = (
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "password1",
+            "password2",
+        )
 
 
 class LoginUserForm(AuthenticationForm):
@@ -69,11 +84,14 @@ class LoginUserForm(AuthenticationForm):
     Args:
         AuthenticationForm (class): _description_
     """
+
     username = forms.CharField(
-        label='Логин', widget=forms.TextInput(attrs={'class': 'form-input'}))
+        label="Логин", widget=forms.TextInput(attrs={"class": "form-input"})
+    )
     password = forms.CharField(
-        label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-input'}))
-    captcha = CaptchaField(label='Введите ответ')
+        label="Пароль", widget=forms.PasswordInput(attrs={"class": "form-input"})
+    )
+    captcha = CaptchaField(label="Введите ответ")
 
 
 class ContactForm(forms.Form):
@@ -81,8 +99,10 @@ class ContactForm(forms.Form):
     Args:
         forms (class): _description_
     """
-    name = forms.CharField(label='Имя', max_length=255)
-    email = forms.EmailField(label='Email')
+
+    name = forms.CharField(label="Имя", max_length=255)
+    email = forms.EmailField(label="Email")
     content = forms.CharField(
-        label='Содержание', widget=forms.Textarea(attrs={'cols': 60, 'rows': 10}))
-    captcha = CaptchaField(label='Введите ответ')
+        label="Содержание", widget=forms.Textarea(attrs={"cols": 60, "rows": 10})
+    )
+    captcha = CaptchaField(label="Введите ответ")

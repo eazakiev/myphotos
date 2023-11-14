@@ -20,7 +20,8 @@
 			<li class="logo"><a href="{% url 'home' %}"><div class="logo"></div></a></li>
 
 {% for m in menu %}
-			<li><a href="{% url m.url_name %}">{{m.title}}</a></li>
+{% if not forloop.last %}<li>{% else %}<li class="last">{% endif %}
+		<li><a href="{% url m.url_name %}">{{m.title}}</a></li>
 {% endfor %}
 
 			{% if request.user.is_authenticated %}
@@ -39,28 +40,20 @@
 <!-- Sidebar слева -->
 	<td valign="top" class="left-chapters">
 	<ul id="leftchapters">
-
-{% if cat_selected == 0 %}
-		<li class='selected'>Все категории</li>
-{% else %}
+		{% if cat_selected == 0 %}
+		<li class="selected">Все категории</li>
+		{% else %}
 		<li><a href="{% url 'home' %}">Все категории</a></li>
-{% endif %}
+		{% endif %}
 
-
-{% for c in cats %}
-{% if c.women__count > 0 %}
-	{% if c.pk == cat_selected %}
-		<li class='selected'>{{c.name}}</li>
-	{% else %}
-		<li><a href="{{ c.get_absolute_url }}">{{c.name}}</a></li>
-	{% endif %}
-{% endif %}
-{% endfor %}
+		{% show_categories cat_selected %}
 
 		<li class="share">
-		<p>Наш канал</p>
+		<p>Мой канал</p>
 		<a class="share-yt" href="https://www.youtube.com/channel/UChuUF3vVD_1kyIN5po31eXw" target="_blank" rel="nofollow"></a>
 		</li>
+
+		<li>{% show_all_tags %}</li>
 	</ul>
 </td>
 <!-- Конец Sidebar'а -->
@@ -71,12 +64,12 @@
 
 <!-- Блок контента -->
 <div class="content-text">
-	{% block content %}
-	{% endblock %}
+{% block content %}
+{% endblock %}
 
-	{% if page_obj.has_other_pages %}
-	<nav class="list-pages">
-		<ul>
+{% if page_obj.has_other_pages %}
+<nav class="list-pages">
+	<ul>
 
 {% if page_obj.has_previous %}
 <li "page-num">
@@ -113,12 +106,11 @@
 <tr><td valign=top>
 	<div id="footer">
 		<p>&copy; 2023 Частичное или полное копирование информации с данного
-      сайта для распространения на других ресурсах, в том числе и
-      бумажных, строго запрещено. Все тексты и изображения являются
-      собственностью сайта.</p>
+		сайта для распространения на других ресурсах, в том числе и
+		бумажных, строго запрещено. Все тексты и изображения являются
+		собственностью сайта.</p>
 	</div>
 </td></tr></table>
 <!-- Конец footer'а и страницы -->
 </body>
 </html>
-

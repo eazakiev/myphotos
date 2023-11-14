@@ -1,5 +1,5 @@
 from django.contrib import admin, messages
-
+from django.utils.safestring import mark_safe
 from .models import MyPhotos, Category
 
 
@@ -10,7 +10,13 @@ class WomenAdmin(admin.ModelAdmin):
         admin (class): _description_
     """
 
-    list_display = ("title", "time_create", "is_published", "cat")  # 'get_html_photo'
+    list_display = (
+        "title",
+        "post_photo",
+        "time_create",
+        "is_published",
+        "cat",
+    )  # 'get_html_photo'
     list_display_links = ("title",)
     ordering = ["time_create", "title"]
     search_fields = ("title", "content", "cat__name")
@@ -19,15 +25,32 @@ class WomenAdmin(admin.ModelAdmin):
     actions = ["set_published", "set_draft"]
     list_filter = ("cat__name", "is_published", "time_create")
     # 'time_create', 'time_update' 'photo','get_html_photo'
-    fields = ["title", "slug", "content", "cat", "is_published", "tags"]
-    readonly_fields = ("time_create", "time_update")  # 'get_html_photo'
+    fields = [
+        "title",
+        "slug",
+        "content",
+        "photo",
+        "post_photo",
+        "cat",
+        "is_published",
+        "tags",
+    ]
+    readonly_fields = ("time_create", "time_update", "post_photo")  # 'get_html_photo'
     prepopulated_fields = {"slug": ("title",)}
     filter_horizontal = ["tags"]
     # filter_vertical = ['tags']
+    save_on_top = True
 
     @admin.display(description="Краткое описание", ordering="content")
     def brief_info(self, myphotos: MyPhotos):
         return f"Описание {len(myphotos.content)} символов"
+
+    @admin.display(description="Изображение", ordering="content")
+    def post_photo(self, myphotos: MyPhotos):
+        """Возвращает HTML-код фотографии."""
+        if myphotos.photo:
+            return mark_safe(f"<img src='{myphotos.photo.url}' width=50>")
+        return "Без фото"
 
     @admin.action(description="Опубликовать выбранные записи")
     def set_published(self, request, queryset):
