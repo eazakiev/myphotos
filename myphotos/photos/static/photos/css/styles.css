@@ -23,14 +23,14 @@ img {
 }
 
 img.img-article-left {
-	max-width: 300px;
+	max-width: 1000px;
 	height: auto;
 	float: left;
 	padding: 0 10px 10px 0;
 }
 
 img.img-article-left.thumb {
-	max-width: 150px;
+	max-width: 500px;
 	height: auto;
 }
 
@@ -350,7 +350,7 @@ ul.content-table li a:hover {
 }
 
 .content-text h1 {
-  font-size: 32px;
+  font-size: 25px;
 }
 
 ul.lang-list {
