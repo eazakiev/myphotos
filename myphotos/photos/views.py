@@ -232,3 +232,15 @@ class TagPostList(ListView):
         return MyPhotos.published.filter(
             tags__slug=self.kwargs["tag_slug"]
         ).select_related("cat")
+
+
+def confidential(request):
+    """О политике конфиденциальности"""
+    return render(
+        request, "photos/confidential.html", {"title": "О сайте", "menu": menu}
+    )
+
+
+def terms(request):
+    """О пользовательском соглашении"""
+    return render(request, "photos/terms.html", {"title": "О сайте", "menu": menu})

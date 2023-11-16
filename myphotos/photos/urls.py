@@ -16,4 +16,7 @@ urlpatterns = [
     path("category/<slug:cat_slug>/", views.PhotosCategory.as_view(), name="category"),
     path("tag/<slug:tag_slug>/", views.TagPostList.as_view(), name="tag"),
     path("edit/<int:pk>/", views.UpdatePage.as_view(), name="edit_page"),
+    path("confidential/", views.confidential, name="confidential"),
+    path("terms/", views.terms, name="terms"),
+
 ]
