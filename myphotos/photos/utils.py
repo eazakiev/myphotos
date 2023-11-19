@@ -13,7 +13,7 @@ menu = [
 class DataMixin:
     """Класс добавления функционала для модели данных."""
 
-    paginate_by = 3
+    paginate_by = 5
 
     def get_user_context(self, **kwargs):
         """Получение контекста пользователя."""
