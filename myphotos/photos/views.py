@@ -32,9 +32,10 @@ class PhotosHome(DataMixin, ListView):
         return MyPhotos.objects.filter(is_published=True).select_related("cat")
 
 
+# @login_required(login_url=reverse_lazy("users:login"))
 def about(request):
     """О сайте"""
-    contact_list = MyPhotos.objects.all()
+    contact_list = MyPhotos.published.all()
     page_number = request.GET.get("page")
     return render(request, "photos/about.html", {"title": "О сайте", "menu": menu})
 
@@ -54,6 +55,7 @@ class AddPage(LoginRequiredMixin, DataMixin, CreateView):
 
     form_class = AddPostForm
     template_name = "photos/addpage.html"
+    title_page = "Добавление статьи"
     success_url = reverse_lazy("home")
     login_url = reverse_lazy("home")
     raise_exception = True
@@ -63,6 +65,12 @@ class AddPage(LoginRequiredMixin, DataMixin, CreateView):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title="Добавление статьи")
         return context | c_def
+
+    def form_valid(self, form):
+        """Обработка формы добавления статьи"""
+        w = form.save(commit=False)
+        w.author = self.request.user
+        return super().form_valid(form)
 
 
 class UpdatePage(UpdateView):

@@ -156,3 +156,4 @@ CACHES = {
 CAPTCHA_FONT_SIZE = 50
 CAPTCHA_FOREGROUND_COLOR = '#343695'
 CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
+LOGIN_URL = 'users:login'
