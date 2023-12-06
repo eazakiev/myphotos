@@ -15,23 +15,26 @@
 <tr><td valign=top>
 
 {% block mainmenu %}
-		<div class="header">
-			<ul id="mainmenu" class="mainmenu">
-			<li class="logo"><a href="{% url 'home' %}"><div class="logo"></div></a></li>
+	<div class="header">
+		<ul id="mainmenu" class="mainmenu">
+		<li class="logo"><a href="{% url 'home' %}"><div class="logo"></div></a></li>
 
-{% for m in menu %}
+
+{% for m in mainmenu %}
 {% if not forloop.last %}<li>{% else %}<li class="last">{% endif %}
-		<li><a href="{% url m.url_name %}">{{m.title}}</a></li>
+	<li><a href="{% url m.url_name %}">{{m.title}}</a></li>
 {% endfor %}
 
-			{% if request.user.is_authenticated %}
-			<li class="last"> {{user.username}} | <a href="{% url 'logout' %}">Выйти</a></li>
-			{% else %}
-			<li class="last"><a href="{% url 'register' %}">Регистрация</a> | <a href="{% url 'login' %}">Войти</a></li>
-			{% endif %}
-			</ul>
-			<div class="clear"></div>
-		</div>
+		{% if request.user.is_authenticated %}
+
+		<li class="last"> <a href="{% url 'users:profile' %}">{{user.username}}</a> | <a href="{% url 'users:logout' %}">Выйти</a></li>
+
+		{% else %}
+		<li class="last"><a href="{% url 'users:login' %}">Войти</a> | <a href="{% url 'users:register' %}">Регистрация</a></li>
+		{% endif %}
+		</ul>
+		<div class="clear"></div>
+	</div>
 {% endblock mainmenu %}
 
 <table class="table-content" border=0 cellpadding="0" cellspacing="0">
@@ -62,14 +65,16 @@
 	{% endblock %}
 
 <!-- Блок контента -->
-<div class="content-text">
-	{% block content %}
-	{% endblock %}
-</div>
+	<div class="content-text">
+{% block content %}
+{% endblock %}
+	</div>
 
 <!-- Конец блока контента -->
+
 {% block navigation %}
 {% endblock  %}
+
 
 </td></tr></table>
 </td></tr>

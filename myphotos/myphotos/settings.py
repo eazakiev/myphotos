@@ -28,7 +28,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["127.0.0.1"]
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -42,6 +41,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'captcha',
     'photos.apps.PhotosConfig',
+    "users.apps.UsersConfig",
 ]
 
 MIDDLEWARE = [
@@ -69,6 +69,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
+                "users.context_processors.get_photo_context",
             ],
         },
     },
@@ -156,4 +158,12 @@ CACHES = {
 CAPTCHA_FONT_SIZE = 50
 CAPTCHA_FOREGROUND_COLOR = '#343695'
 CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
+
+LOGIN_REDIRECT_URL = "home"
+LOGOUT_REDIRECT_URL = "home"
 LOGIN_URL = 'users:login'
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "users.authentication.EmailAuthBackend",
+]

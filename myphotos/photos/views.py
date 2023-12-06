@@ -1,13 +1,12 @@
 from django.http import HttpResponseNotFound
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, FormView, UpdateView
-from .forms import AddPostForm, LoginUserForm, RegisterUserForm, ContactForm
+from .forms import AddPostForm, ContactForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect, render
-from django.contrib.auth import logout, login
-from django.contrib.auth.views import LoginView
+
 from .models import Category, MyPhotos, TagPost
-from .utils import DataMixin, menu
+from .utils import *
 
 
 class PhotosHome(DataMixin, ListView):
@@ -17,15 +16,14 @@ class PhotosHome(DataMixin, ListView):
         ListView (class): _description_
     """
 
-    model = MyPhotos
     template_name = "photos/index.html"
     context_object_name = "posts"
+    cat_selected = 0
 
     def get_context_data(self, *, object_list=None, **kwargs):
         """Получение контекста для главной страницы сайта"""
         context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title="Главная страница")
-        return context | c_def
+        return self.get_mixin_context(context, title="Главная страница")
 
     def get_queryset(self):
         """Получение объектов для постов"""
@@ -35,8 +33,8 @@ class PhotosHome(DataMixin, ListView):
 # @login_required(login_url=reverse_lazy("users:login"))
 def about(request):
     """О сайте"""
-    contact_list = MyPhotos.published.all()
-    page_number = request.GET.get("page")
+    # contact_list = MyPhotos.published.all()
+    # page_number = request.GET.get("page")
     return render(request, "photos/about.html", {"title": "О сайте", "menu": menu})
 
 
@@ -57,14 +55,13 @@ class AddPage(LoginRequiredMixin, DataMixin, CreateView):
     template_name = "photos/addpage.html"
     title_page = "Добавление статьи"
     success_url = reverse_lazy("home")
-    login_url = reverse_lazy("home")
-    raise_exception = True
+    # login_url = reverse_lazy("home")
+    # raise_exception = True
 
     def get_context_data(self, *, object_list=None, **kwargs):
         """Получение контекста для добавления статьи"""
         context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title="Добавление статьи")
-        return context | c_def
+        return self.get_mixin_context(context, title="Добавление статьи")
 
     def form_valid(self, form):
         """Обработка формы добавления статьи"""
@@ -73,15 +70,14 @@ class AddPage(LoginRequiredMixin, DataMixin, CreateView):
         return super().form_valid(form)
 
 
-class UpdatePage(UpdateView):
+class UpdatePage(DataMixin, UpdateView):
+    """Класс для редактирования статьи"""
+
     model = MyPhotos
     fields = ["title", "content", "photo", "is_published", "cat"]
     template_name = "photos/addpage.html"
     success_url = reverse_lazy("home")
-    extra_context = {
-        "menu": menu,
-        "title": "Редактирование статьи",
-    }
+    title_page = "Редактирование статьи"
 
 
 class ContactFormView(DataMixin, FormView):
@@ -99,8 +95,7 @@ class ContactFormView(DataMixin, FormView):
     def get_context_data(self, *, object_list=None, **kwargs):
         """Получение контекста для шаблона, формы контактов"""
         context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title="Обратная связь")
-        return context | c_def
+        return self.get_mixin_context(context, title="Обратная связь")
 
     def form_valid(self, form):
         """
@@ -118,7 +113,6 @@ class ShowPost(DataMixin, DetailView):
         DetailView (class): _description_
     """
 
-    model = MyPhotos
     template_name = "photos/post.html"
     slug_url_kwarg = "post_slug"
     context_object_name = "post"
@@ -126,8 +120,7 @@ class ShowPost(DataMixin, DetailView):
     def get_context_data(self, *, object_list=None, **kwargs):
         """Получение контекста для представления статьи"""
         context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title=context["post"])
-        return context | c_def
+        return self.get_mixin_context(context, title=context["post"].title)
 
     def get_object(self, queryset=None):
         return get_object_or_404(
@@ -142,7 +135,6 @@ class PhotosCategory(DataMixin, ListView):
         ListView (class): _description_
     """
 
-    model = MyPhotos
     template_name = "photos/index.html"
     context_object_name = "posts"
     allow_empty = False
@@ -153,71 +145,16 @@ class PhotosCategory(DataMixin, ListView):
             cat__slug=self.kwargs["cat_slug"], is_published=True
         ).select_related("cat")
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         """Получение контекста для списка категорий"""
         context = super().get_context_data(**kwargs)
-        c = Category.objects.get(slug=self.kwargs["cat_slug"])
-        c_def = self.get_user_context(
-            title="Категория - " + str(c.name), cat_selected=c.pk
+        cat = Category.objects.get(slug=self.kwargs["cat_slug"])
+        return self.get_mixin_context(
+            context, title="Категория - " + cat.name, cat_selected=cat.pk
         )
-        return context | c_def
 
 
-class RegisterUser(DataMixin, CreateView):
-    """Класс для регистрации пользователя
-    Args:
-        DataMixin (class): _description_
-        CreateView (class): _description_
-    """
-
-    form_class = RegisterUserForm
-    template_name = "photos/register.html"
-    success_url = reverse_lazy("login")
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        """Получение контекста для регистрации пользователя"""
-        context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title="Регистрация")
-        return context | c_def
-
-    def form_valid(self, form):
-        """
-        Обработка формы регистрации пользователя, вызывается если
-        пользователь корректно заполнил все поля контактной формы
-        """
-        user = form.save()
-        login(self.request, user)
-        return redirect("home")
-
-
-class LoginUser(DataMixin, LoginView):
-    """Класс для авторизации пользователя
-    Args:
-        DataMixin (class): _description_
-        LoginView (class): _description_
-    """
-
-    form_class = LoginUserForm
-    template_name = "photos/login.html"
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        """Получение контекста для авторизации пользователя"""
-        context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title="Авторизация")
-        return context | c_def
-
-    def get_success_url(self):
-        """Получение страницы после авторизации пользователя"""
-        return reverse_lazy("home")
-
-
-def logout_user(request):
-    """Получение перенаправления после авторизации пользователя"""
-    logout(request)
-    return redirect("login")
-
-
-class TagPostList(ListView):
+class TagPostList(DataMixin, ListView):
     """Класс получение списка постов по тегу
     Args:
         DataMixin (class): _description_
@@ -231,10 +168,7 @@ class TagPostList(ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         tag = TagPost.objects.get(slug=self.kwargs["tag_slug"])
-        context["title"] = "Тег: " + tag.tag
-        context["menu"] = menu
-        context["cat_selected"] = None
-        return context
+        return self.get_mixin_context(context, title="Тег: " + tag.tag)
 
     def get_queryset(self):
         return MyPhotos.published.filter(
