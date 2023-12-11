@@ -1,8 +1,8 @@
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, PasswordChangeView
 from django.views.generic import CreateView, UpdateView
-from .forms import ProfileUserForm, RegisterUserForm
+from .forms import ProfileUserForm, RegisterUserForm, UserPasswordChangeForm
 from django.contrib.auth import logout
 from django.urls import reverse_lazy
 from .forms import LoginUserForm
@@ -61,3 +61,12 @@ class ProfileUser(LoginRequiredMixin, UpdateView):
     def get_object(self, queryset=None):
         """Получение объектов для регистрации пользователя"""
         return self.request.user
+
+
+class UserPasswordChange(PasswordChangeView):
+    """Класс для изменения пароля пользователя."""
+
+    form_class = UserPasswordChangeForm
+    success_url = reverse_lazy("users:password_change_done")
+    template_name = "users/password_change_form.html"
+    extra_context = {"title": "Изменение пароля"}
